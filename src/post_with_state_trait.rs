@@ -14,6 +14,21 @@ impl Default for PostWithStateTrait {
     }
 }
 
+macro_rules! state_transition_fn {
+    ($state:ident) => {
+        fn $state(&mut self) {
+            if let Some(state) = self.state.take() {
+                self.state = Some(state.$state());
+            }
+        }
+    };
+
+    ($state:ident, $($rest:ident),+) => {
+        state_transition_fn!($state);
+        state_transition_fn!($($rest),+);
+    };
+}
+
 impl Post for PostWithStateTrait {
     fn add_text(&mut self, text: &str) {
         if let Some(state) = self.state.take() {
@@ -26,23 +41,7 @@ impl Post for PostWithStateTrait {
         self.state.as_ref().unwrap().content(self)
     }
 
-    fn request_review(&mut self) {
-        if let Some(state) = self.state.take() {
-            self.state = Some(state.request_review());
-        }
-    }
-
-    fn approve(&mut self) {
-        if let Some(state) = self.state.take() {
-            self.state = Some(state.approve());
-        }
-    }
-
-    fn reject(&mut self) {
-        if let Some(state) = self.state.take() {
-            self.state = Some(state.reject());
-        }
-    }
+    state_transition_fn!(request_review, approve, reject);
 }
 
 trait State {
