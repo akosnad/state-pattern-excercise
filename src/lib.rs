@@ -1,7 +1,9 @@
 mod post_with_enum_state;
+mod post_with_ownership_state;
 mod post_with_state_trait;
 
 pub use post_with_enum_state::PostWithEnumState;
+pub use post_with_ownership_state::PostWithOwnershipState;
 pub use post_with_state_trait::PostWithStateTrait;
 
 pub trait Post {
